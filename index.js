@@ -3,7 +3,7 @@ require('dotenv').config()
 const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // midleware
 app.use(cors())
 app.use(express.json())
@@ -35,6 +35,26 @@ async function run(){
       const result = await todocollection.insertOne(tool)
       res.send(result)
     })
+    app.delete('/tododel/:id', async(req,res)=>{
+      const id = req.params.id
+      const query = {_id: ObjectId(id)}
+      console.log(query);
+      const result = await todocollection.deleteOne(query)
+      res.send(result) 
+   })
+   app.put('/update/:email', async(req,res)=>{
+    const email = req.params.email 
+    const updatetodo = req.body 
+    const filter = { email : email}
+    const options = { upsert: true };
+    const updatedDoc ={
+      $set:{
+        todo: updatetodo.todo
+      }
+    }
+    const result = await todocollection.updateOne(filter, updatedDoc, options)
+    res.send(result)
+  })
   }
   finally{
 
